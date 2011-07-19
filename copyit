@@ -1,0 +1,4 @@
+cp /Volumes/macShare/redisManager.js redisManager.js
+cp /Volumes/macShare/redisMaster.conf redisMaster.conf
+cp /Volumes/macShare/masterTemplate.conf masterTemplate.conf
+node redisManager.js -cf redisMaster.conf -c startAll
