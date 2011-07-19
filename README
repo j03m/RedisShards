@@ -1,0 +1,11 @@
+What is it: A simple nodejs script you can use to manage a number of redis pre-shards. (Here's hoping for great things from cluster)
+
+How to use it: 
+1. Modify masterTemplate.conf to your liking
+2. Set up redisMaster.conf with your instances, follow the json as an example
+3. Set up your pub/priv keys so you can ssh, scp to your instances without entering a pass
+4. Modify the path's and then copy redisInitScript.sh, startRedis.sh, stopRedis.sh to your user directory on each instance
+5. Use nodejs to invoke redisManager.js ie, node redisManager.js with the commands: redisManager.js -c [createConfigs|startAll|stopAll]
+
+Make sure you run createConfigs first. Also requires js-opts (https://bitbucket.org/mazzarelli/js-opts/wiki/Home)
+
