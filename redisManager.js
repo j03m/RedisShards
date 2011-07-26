@@ -6,13 +6,15 @@ var exec = require('child_process').exec;
 var createConfigs = "createConfigs";
 var startAll = "startAll";
 var stopAll = "stopAll";
-var monitor = "monitor";
+var monitor = "monitor"; //todo
+var execute = "execute"; //todo
+
 var echoConfig= "echoConfig";
 
 var options = [
 	{   short       : 'c'
 	, long        : 'command'
-	, description : 'The action you want the script to take values: createConfigs, startAll, stopAll, monitor'
+	, description : 'The action you want the script to take values: createConfigs, startAll, stopAll, execute'
 	, value	: true      
 	, required : true
 	},
@@ -22,12 +24,18 @@ var options = [
 	, value	: true      
 	, required : true
 	},
+	{  short       : 'e'
+		, long        : 'exec'
+		, description : 'A command you want to send to redis.'
+		, value	: true      		
+	}
 
 ];
 
 opts.parse(options, true);
 var c = opts.get('c'); //command
 var cf = opts.get('cf'); //conf file
+var e = opts.get('e'); //optional command
 var confObj = undefined;
 
 //read the config file
@@ -167,28 +175,55 @@ fs.readFile(cf, function (err, data)
 		for(var i =0; i<confObj.instances.length; i++)
 		{
 			var instance = confObj.instances[i];
-			var command = "./stopRedis " + instance.ip + " " + instance.port;
+			var command = "./stopRedis.sh " + instance.ip + " " + instance.port;
 			remoteExec(instance.ip, command, undefined, undefined, undefined, instance, function(error, stdout,stderr, directory, theTemplateFile, theTemplateFileName, theInstance)
 			{
 				if (error)
 				{
-					Console.log("Failed to stop an instance: " + theInstance.name);
+					console.log("Failed to stop an instance: " + theInstance.name);
 					throw error;
 				}
 
 				if (stderr)
 				{
-					Console.log("Looks like redis didn't want to stop for instance: " + theInstance.name);
+					console.log("Looks like redis didn't want to stop for instance: " + theInstance.name);
 					throw error;
 				}
 
-				Console.log ("Redis stopped for instance: " + theInstance.name + ".\nStdout: " + stdout);				
+				console.log ("Redis stopped for instance: " + theInstance.name + ".\nStdout: " + stdout);				
 
 			});
 
 		}//end for
 					
 	}//end else if (c == stopAll) 
+	else if (c == execute)
+	{		
+		for(var i =0; i<confObj.instances.length; i++)
+		{
+			var instance = confObj.instances[i];
+			var command = "./executeRedis.sh " + instance.ip + " " + instance.port + " " + "\\\"" + e + "\\\"";
+			console.log(command);
+			remoteExec(instance.ip, command, undefined, undefined, undefined, instance, function(error, stdout,stderr, directory, theTemplateFile, theTemplateFileName, theInstance)
+			{
+				if (error)
+				{
+					console.log("Failed to execute command: " + e + " on: " + theInstance.name);
+					throw error;
+				}
+
+				if (stderr)
+				{
+					console.log("Failed to execute command: " + e + " on: " + theInstance.name);
+					throw stderr;
+				}
+
+				console.log("Executed command: " + e + " on: " + theInstance.name + " result: " + stdout);
+
+			});	
+		}//end for
+		
+	}//end else if (c == execute) 
 });//end fs.readFile(cf, function (err, data) 
 
 		
