@@ -1,11 +1,27 @@
-What is it: A simple nodejs script you can use to manage a number of redis pre-shards. (Here's hoping for great things from cluster)
+What is it: A set of nodejs scripts you can use to manage a number of redis pre-shards. (Here's hoping for great things from cluster)
+
+There are two scripts you want to be aware of: RedisManager.js and redisRing.js
+
+RedisManager.js is a tool that will spin up and configure redis instances on different machines providing you have SSH to those machines.
 
 How to use it: 
 1. Modify masterTemplate.conf to your liking
 2. Set up redisMaster.conf with your instances, follow the json as an example
 3. Set up your pub/priv keys so you can ssh, scp to your instances without entering a pass
 4. Modify the path's and then copy redisInitScript.sh, startRedis.sh, stopRedis.sh to your user directory on each instance
-5. Use nodejs to invoke redisManager.js ie, node redisManager.js with the commands: redisManager.js -c [createConfigs|startAll|stopAll]
+5. Make sure your ssh user can execute those scripts on the remote instances
+6. Use nodejs to invoke redisManager.js ie, node redisManager.js with the commands: redisManager.js -c [createConfigs|startAll|stopAll|execute]
 
 Make sure you run createConfigs first. Also requires js-opts (https://bitbucket.org/mazzarelli/js-opts/wiki/Home)
+
+redisRing is essentially a wrapper around the node_redis client (https://github.com/mranney/node_redis) that uses
+node hash ring (https://github.com/bnoguchi/node-hash-ring) to direct your queries to different shards. The code always
+uses your key as the basis for which instance to hit - so there are some obvious gotchas with using the m* operations. Be warned.
+
+All code in this repo is offered on the MIT license http://en.wikipedia.org/wiki/MIT_License
+
+
+
+
+
 
